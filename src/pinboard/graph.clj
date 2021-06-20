@@ -7,21 +7,32 @@
   (:require [ubergraph.core :as uber]
             [clojure.data.xml :as xml]))
 
+;; ----------------
 (defn all-degrees
   "Return the degrees of all the nodes as a map."
   [g]
   (zipmap (uber/nodes g)
           (map (partial uber/in-degree g)
                (uber/nodes g))))
+j
+(defn get-neighbours
+  "Get all neighbours of a node."
+  [g node]
+  (map #(uber/node-with-attrs g %)
+       (uber/neighbors g node)))
 
-;; My Pinboard attributes
+;; ----------------
 (def pinboard-attributes
     [(xml/element :key {:id "d0" :for "node" :attr.name "href" :attr.type "string"})
      (xml/element :key {:id "d1" :for "node" :attr.name "description" :attr.type "string"})
      (xml/element :key {:id "d2" :for "node" :attr.name "time" :attr.type "string"})
      (xml/element :key {:id "d3" :for "node" :attr.name "type" :attr.type "string"})])
 
-(defn node-data
+(def tag-attributes
+  [])
+
+;; ----------------
+(defn pinboard-node-data
   "Convert a graph node to GraphML."
   [g n]
   (let [attrs (uber/attrs g n)]
@@ -34,6 +45,11 @@
                    (xml/element :data {:key "d2"} (:time attrs))
                    (xml/element :data {:key "d3"} (:type attrs))))))
 
+(defn tag-node-data
+  [g n]
+  (xml/element :node {:id (name n)}))
+
+;; ----------------
 (defn edge-data
   "Convert a graph edge to GraphML."
   [_ e]
@@ -46,17 +62,27 @@
     ;; else
     "directed"))
 
+;; ----------------
 (defn to-graphml
   "Convert Ubergraph to a GraphML format using Pinboard attributes."
-  [g]
+  [g attrs node-fn]
   (xml/element :graphml
                {:xmlns "http://graphml.graphdrawing.org/xmlns"}
                (xml/element :graph
                             {:id "G" :edgedefault (edge-default g)}
-                            pinboard-attributes
-                            (map (partial node-data g) (uber/nodes g))
+                            attrs
+                            (map (partial node-fn g) (uber/nodes g))
                             (map (partial edge-data g) (uber/edges g)))))
 
+(defn pinboard-to-graphml
+  [g]
+  (to-graphml pinboard-attributes pinboard-node-data))
+
+(defn tags-to-graphml
+  [g]
+  (to-graphml g tag-attributes tag-node-data))
+
+;; ----------------
 (defn write-graphml
   "Write XML tree to a file."
   [x out-file-name]
