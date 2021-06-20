@@ -18,7 +18,8 @@
 (def pinboard-attributes
     [(xml/element :key {:id "d0" :for "node" :attr.name "href" :attr.type "string"})
      (xml/element :key {:id "d1" :for "node" :attr.name "description" :attr.type "string"})
-     (xml/element :key {:id "d2" :for "node" :attr.name "time" :attr.type "string"})])
+     (xml/element :key {:id "d2" :for "node" :attr.name "time" :attr.type "string"})
+     (xml/element :key {:id "d3" :for "node" :attr.name "type" :attr.type "string"})])
 
 (defn node-data
   "Convert a graph node to GraphML."
@@ -30,7 +31,8 @@
       (xml/element :node {:id (name n)}
                    (xml/element :data {:key "d0"} (:href attrs))
                    (xml/element :data {:key "d1"} (:description attrs))
-                   (xml/element :data {:key "d2"} (:time attrs))))))
+                   (xml/element :data {:key "d2"} (:time attrs))
+                   (xml/element :data {:key "d3"} (:type attrs))))))
 
 (defn edge-data
   "Convert a graph edge to GraphML."

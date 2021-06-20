@@ -6,7 +6,7 @@
   (:gen-class))
 
 (def testf "data/test.json")
-(def inputf "data/pinboard-2021-03-07.json")
+(def inputf "data/pinboard-2021-06-20.json")
 
 (defn read-export
   "Read the exported data into a map, and separate tags into a vector."
@@ -17,17 +17,22 @@
     (map (fn [e] (update e :tags #(str/split % #"\s+"))) <>)))
 
 (defn add-bookmark
-  "Add a bookmark map to the graph."
-  [g bmark]
+  "Add a edge between the bookmark and each tag,
+   and attach some attributes to the bookmark."
+  [graph bmark]
   (let [id (:hash bmark)]
-    (reduce (fn [g1 tag]
+    (reduce (fn [g tag]
               (if (empty? tag)
-                g1
+                g
                 ;; else
-                (-> g1
-                   (uber/add-edges [id (keyword tag)])
-                   (uber/add-attrs id (select-keys bmark [:href :description :time])))))
-            g (:tags bmark))))
+                (let [tag-id (keyword tag)]
+                  (-> g
+                      (uber/add-edges [id tag-id])
+                      (uber/add-attrs id (into {:type "node"}
+                                               (select-keys bmark [:href :description :time])))
+                      (uber/add-attrs tag-id {:type "tag" :description tag})))))
+            graph
+            (:tags bmark))))
 
 (defn create-graph
   "Create the graph from a map of entries."
