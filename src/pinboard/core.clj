@@ -101,4 +101,10 @@
       gr/tags-to-graphml
       (gr/write-graphml outfile)))
 
+(defn -main
+  [& args]
+  (if (== 2 (count *command-line-args*))
+    (make-tag-graph (first *command-line-args*) (second *command-line-args*))
+    (println "Usage: lein run <infile> <outfile>")))
+
 ;; The End

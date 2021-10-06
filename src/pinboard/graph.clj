@@ -14,7 +14,7 @@
   (zipmap (uber/nodes g)
           (map (partial uber/in-degree g)
                (uber/nodes g))))
-j
+
 (defn get-neighbours
   "Get all neighbours of a node."
   [g node]
@@ -76,7 +76,7 @@ j
 
 (defn pinboard-to-graphml
   [g]
-  (to-graphml pinboard-attributes pinboard-node-data))
+  (to-graphml g pinboard-attributes pinboard-node-data))
 
 (defn tags-to-graphml
   [g]
