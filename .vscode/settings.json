@@ -1,0 +1,4 @@
+{
+    "vim.useSystemClipboard": true,
+    "vim.vimrc.enable": true
+}
